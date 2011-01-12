@@ -1,7 +1,5 @@
-#!/home/mrwilson/node-v0.2.5/node
-
-var db = require( './lib/dirty' )('music-server.db');
-var test = require('./bucket.js');
+var db = require( '../lib/dirty' )('test.db');
+var test = require('../bucket');
 
 db.set( "currentbucket", 2);
 db.set( "user_Bubbles", {"bucket" : 1});

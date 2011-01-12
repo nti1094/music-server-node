@@ -1,4 +1,4 @@
-var art = require('./art');
+var art = require('../art');
 
 art.amazonAlbum('./tmp/', 'Say hi', 'The wishes and the glitch', function(error, img) {
 	if (error) {
