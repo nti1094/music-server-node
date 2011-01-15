@@ -1,4 +1,5 @@
-var db = require( '../lib/dirty' )('test.db');
+var db = require('../lib/dirty')('test.db');
+
 var test = require('../bucket');
 
 db.set( "currentbucket", 2);
@@ -16,15 +17,23 @@ test.queueTrack( "Bubbles", "test2", db );
 test.queueTrack( "Buttercup", "test3", db );
 test.queueTrack( "Bubbles", "test4", db );
 
-db.forEach( function ( key, val ) {
-	if ( /bucket_/.exec( key ) != null ) {
-		console.log("Bucket = "+key.split("_")[1]);
-		for( var i in val ) {
-			var data = db.get( val[i].track );
-			console.log( data.track+" - "+data.artist+". Queued by "+val[i].user );
-		}
-		console.log("\n");
-	}
-});
- 
+showAll();
+console.log("-------------------------");
 
+test.deleteTrack( "Bubbles", "bucket_2", db);
+
+showAll();
+
+function showAll () {
+
+	db.forEach( function ( key, val ) {
+			if ( /bucket_/.exec( key ) != null ) {
+				console.log("Bucket = "+key.split("_")[1]);
+				for( var i in val ) {
+					var data = db.get( val[i].track );
+					console.log( data.track+" - "+data.artist+". Queued by "+val[i].user );
+				}
+			console.log("\n");
+			}
+	});
+}
