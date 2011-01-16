@@ -168,4 +168,9 @@ exports.deleteTrack = function ( user, bucket, db ) {
 			bucketIndex++;
 		}
 	}
+
+	var userData = db.get( user );
+	userData.bucket--;
+	db.set( user, userData ); 
+
 }
