@@ -20,7 +20,7 @@ test.queueTrack( "Bubbles", "test4", db );
 showAll();
 console.log("-------------------------");
 
-test.deleteTrack( "Bubbles", "bucket_2", db);
+test.upSwitch( "Bubbles", 3, db);
 
 showAll();
 

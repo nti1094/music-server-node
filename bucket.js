@@ -57,20 +57,20 @@ exports.queueTrack = function ( user, track, db ) {
 exports.upSwitch = function ( user, bucket, db ) {
 	
 	//Can't upshift into a bucket before the current one, or from one that doesn't exist.
-
-	if ( bucket.split("_")[1] <= db.get( "currentbucket" ) || !db.get( bucket ) ) {
-		console.log("Too small/bucket doesn't exist");
-		return;
+	
+	if ( bucket <= db.get( "currentbucket" ) || !db.get( "bucket_" + bucket ) ) {
+		return false;
 	}
 	else {
-		var oldTracks = db.get( bucket );
 		
 		//Get index for the bucket above, and fetch it.
-		var newBucket = "bucket_"+( bucket.split("_")[1] - 1);
+		var newBucket = "bucket_" + ( bucket - 1 );
+		bucket = "bucket_" + bucket;
 		var newTracks = db.get( newBucket );
+		var oldTracks = db.get( bucket );
 
 		var oldTrackData, newTrackData;
-
+		
 		oldTracks.forEach( function ( queuedTrack ) {
 			if ( queuedTrack.user == user ) {
 				oldTrackData = queuedTrack;
@@ -85,7 +85,7 @@ exports.upSwitch = function ( user, bucket, db ) {
 
 		if ( oldTrackData == undefined || newTrackData == undefined ) {
 			console.log("One of the trackdatas is undefined");
-			return;
+			return false;
 		}
 		
 		else {
@@ -101,11 +101,12 @@ exports.upSwitch = function ( user, bucket, db ) {
 
 function upshift ( user, bucket, db ) {
 	
-	var nextBucket = "bucket_" + (bucket.split("_")[1]*1 + 1);
+	var nextBucket = "bucket_" + ( bucket + 1 )
+	bucket = "bucket_" + bucket;
+	console.log( bucket );
 	
 	if ( !db.get( bucket ) ) {
-		console.log("Bucket does not exist");
-		return;
+		return false;
 	}
 	else { 
 		if ( db.get( nextBucket ) ) {
@@ -127,6 +128,7 @@ function upshift ( user, bucket, db ) {
 				});
 	
 				db.set( bucket, theseTracks );
+				return true;
 			}
 			else {		
 				theseTracks.forEach( function ( queuedTrack ) {
@@ -142,6 +144,7 @@ function upshift ( user, bucket, db ) {
 				else {
 		
 					db.set( bucket, theseTracks );
+					return true;
 				}
 			}
 		}
@@ -151,19 +154,18 @@ function upshift ( user, bucket, db ) {
 
 exports.deleteTrack = function ( user, bucket, db ) {
 	
-	if ( !db.get( bucket ) ) {
+
+	if ( !db.get( "bucket_"+bucket ) ) {
 		//HNNNNNNNNNNNG.
-		return;
+		return false;
 	}
 	else {
-		var bucketIndex = bucket.split("_")[1]*1;
-		var nextBucket = bucket;
+		var bucketIndex = bucket;
 		var userData = db.get( "user_" + user );
 	
 		while ( bucketIndex <= userData.bucket ) {
-			upshift( user, nextBucket, db );
+			upshift( user, bucketIndex, db );
 			bucketIndex++;
-			nextBucket = "bucket_" + bucketIndex;
 		}
 	}
 }
